@@ -67,25 +67,25 @@ public class UI {
 		if (background) {
 			System.out.print(ANSI_BLUE_BACKGROUND);
 		}
-    	if (piece == null) {
-            System.out.print("-" + ANSI_RESET);
-        }
-        else {
-            if (piece.getColor() == Color.WHITE) {
-                System.out.print(ANSI_WHITE + piece + ANSI_RESET);
-            }
-            else {
-                System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
-            }
-        }
-    	
-        System.out.print(" ");
+		if (piece == null) {
+			System.out.print("-" + ANSI_RESET);
+		} else {
+			if (piece.getColor() == Color.WHITE) {
+				System.out.print(ANSI_WHITE + piece + ANSI_RESET);
+			} else {
+				System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
+			}
+		}
+
+		System.out.print(" ");
 	}
-	
+
 	private static void printCapturedPieces(List<ChessPiece> captured) {
-		List<ChessPiece> white = captured.stream().filter(x -> x.getColor().equals(Color.WHITE)).collect(Collectors.toList());
-		List<ChessPiece> black = captured.stream().filter(x -> x.getColor().equals(Color.BLACK)).collect(Collectors.toList());
-		
+		List<ChessPiece> white = captured.stream().filter(x -> x.getColor().equals(Color.WHITE))
+				.collect(Collectors.toList());
+		List<ChessPiece> black = captured.stream().filter(x -> x.getColor().equals(Color.BLACK))
+				.collect(Collectors.toList());
+
 		System.out.println("Captured pieces:");
 		System.out.print("White: ");
 		System.out.print(ANSI_WHITE);
@@ -96,18 +96,28 @@ public class UI {
 		System.out.println(Arrays.toString(black.toArray()));
 		System.out.print(ANSI_RESET);
 	}
-	
+
 	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 		printBoard(chessMatch.getPieces());
 		System.out.println("\n");
 		printCapturedPieces(captured);
 		System.out.println();
 		System.out.println("Turn: " + chessMatch.getTurn());
-		System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
-		
-		if(chessMatch.getCheck()) {
+		if (!chessMatch.getCheckMate()) {
+			System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
+			
+			if (chessMatch.getCheck()) {
+				System.out.println();
+				System.out.println(ANSI_RED + "CHECK!" + ANSI_RESET);
+			}
+		}
+		else {
 			System.out.println();
-			System.out.println(ANSI_RED + "CHECK!" + ANSI_RESET);
+			System.out.println(ANSI_GREEN + "CHECKMATE!!!" + ANSI_RESET);
+			System.out.println("Winner: " + 
+					(chessMatch.getCurrentPlayer().equals(Color.WHITE) ? 
+							ANSI_WHITE + Color.WHITE + ANSI_RESET
+							: ANSI_YELLOW + Color.BLACK + ANSI_RESET));
 		}
 	}
 
