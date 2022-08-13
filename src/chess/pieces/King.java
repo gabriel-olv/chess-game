@@ -2,13 +2,26 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class King extends ChessPiece {
 
-	public King(Board board, Color color) {
+	private ChessMatch chessMatch;
+	
+	public King(Board board, Color color, ChessMatch chessMatch) {
 		super(board, color);
+		this.chessMatch = chessMatch;
+	}
+	
+	public ChessMatch getChessMatch() {
+		return chessMatch;
+	}
+	
+	private boolean testRookCastling(Position position) {
+		ChessPiece p = (ChessPiece) getBoard().piece(position);
+		return p != null && p instanceof Rook && p.getColor().equals(getColor()) && p.getMoveCount() == 0;
 	}
 
 	@Override
@@ -64,7 +77,34 @@ public class King extends ChessPiece {
 		if (getBoard().positionExists(p) && canMove(p)) {
 			mat[p.getRow()][p.getColumn()] = true;
 		}
-
+		
+		// #specialmove castling
+		if (getMoveCount() == 0 && !chessMatch.getCheck()) {
+			Position aux = new Position(position.getRow(), position.getColumn());
+			boolean[] canMove = new boolean[5];
+			
+			for (int i = 0; i < canMove.length; i++) {
+				if (i < 2) {
+					aux.setColumn(position.getColumn() + i + 1);
+				}
+				else {
+					aux.setColumn(position.getColumn() + 1 - i);
+				}
+				canMove[i] = canMove(aux);
+			}
+			
+			//right castling
+			aux.setValues(position.getRow(), position.getColumn() + 3);
+			if (canMove[0] && canMove[1] && testRookCastling(aux)) {
+				mat[position.getRow()][position.getColumn() + 2] = true;
+			}
+			
+			//left castling
+			aux.setValues(position.getRow(), position.getColumn() - 4);
+			if (canMove[2] && canMove[3] && canMove[4] && testRookCastling(aux)) {
+				mat[position.getRow()][position.getColumn() - 2] = true;
+			}
+		}
 		return mat;
 	}
 
